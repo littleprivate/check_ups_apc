@@ -8,6 +8,7 @@ Based on check_ups_apc.pl from altinity.com (Opsview) with modifications of Blue
     Frequency-Monitoring (with perfdata)
     Voltage-Monitoring (Input/Output and perfdata)
     Battery Replacement notification
+    UPS Serialnumber
 
 Usage:
 
