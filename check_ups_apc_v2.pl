@@ -522,7 +522,7 @@ sub main {
 	}
 	elsif ($battery_replace == 1  ) {
 		$returnstring = $returnstring . "BATTERY OK!";
-		$status = 0;
+		$status = 0 if ( ( $status != 2 ) && ( $status != 1 ) );
 	}
 	else {
 		$status = 3;
