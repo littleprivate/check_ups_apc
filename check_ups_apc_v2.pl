@@ -516,7 +516,7 @@ sub main {
           }
       else {
           $returnstring = $returnstring . "BATTERY OK!";
-          $status = 3 if ( ( $status == 1 ) );
+          $status = 3 if ( ( $status != 1 ) );
       }
 
       $returnstring = $returnstring . " UPS Serialnumber: $ups_serial - ";
