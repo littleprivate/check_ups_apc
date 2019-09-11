@@ -30,6 +30,12 @@
 #	Script edit by Andreas Winter (info@aw-edv-systeme.de)
 #	* adding Battery Replacement check
 #
+############
+#
+#	Script modified by M. Fuchs
+#
+############
+
 
 use Net::SNMP;
 use Getopt::Std;
@@ -509,18 +515,20 @@ sub main {
         $status = 3 if ( ( $status != 2 ) && ( $status != 1 ) );
     }
 	
-######## Added by AW #############
-     if ($battery_replace == 2  ) {
-           $returnstring = $returnstring . "!!!BATTERY NEEDS REPLACING!!! - ";
-            $status = 2;
-          }
-      else {
-          $returnstring = $returnstring . "BATTERY OK!";
-          $status = 3 if ( ( $status == 1 ) );
-      }
+######## Added by AW / modified by M. Fuchs #############
+	if ($battery_replace == 2  ) {
+		$returnstring = $returnstring . "!!!BATTERY NEEDS REPLACING!!! - ";
+		$status = 2;
+	}
+	elsif ($battery_replace == 1  ) {
+		$returnstring = $returnstring . "BATTERY OK!";
+		$status = 0;
+	}
+	else {
+		$status = 3;
+	}
 
-      $returnstring = $returnstring . " UPS Serialnumber: $ups_serial - ";
-
+	$returnstring = $returnstring . " UPS Serialnumber: $ups_serial - ";
 
 ####################
 	
