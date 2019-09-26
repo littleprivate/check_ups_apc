@@ -33,6 +33,7 @@
 ############
 #
 #	Script modified by M. Fuchs
+#	* added custom warning temperature
 #
 ############
 
@@ -77,6 +78,7 @@ $output_status = 0;
 $output_current =0;
 $output_load = 0;
 $temperature = 0;
+$warn_temperature = 36;	# M. Fuchs
 
 $input_freq = 0;		# added by Blueeye
 $output_freq = 0;		# added by Blueeye
@@ -92,7 +94,7 @@ if (@ARGV < 1) {
      usage();
 }
 
-getopts("h:H:C:w:c:");
+getopts("h:H:C:T:w:c");
 if ($opt_h){
     usage();
     exit(0);
@@ -110,6 +112,11 @@ if ($opt_C){
 else {
 }
 
+if ($opt_T){
+    $warn_temperature = $opt_T;
+}
+else {
+}
 
 
 # Create the SNMP session
@@ -436,17 +443,17 @@ sub main {
 
     if ($temperature > 38) {
         $returnstring = $returnstring . "!!!CRITICAL TEMPERATURE!!! $temperature C - ";
-        $perfdata = $perfdata . "'temp'=$temperature;35;38;0;70 ";
+        $perfdata = $perfdata . "'temp'=$temperature;$warn_temperature;38;0;70 ";
         $status = 2;
     }
-    elsif ($temperature > 35) {
+    elsif ($temperature > $warn_temperature) {
         $returnstring = $returnstring . "!!!WARNING TEMPERATURE!!! $temperature C - ";
-        $perfdata = $perfdata . "'temp'=$temperature;35;38;0;70 ";
+        $perfdata = $perfdata . "'temp'=$temperature;$warn_temperature;38;0;70 ";
         $status = 1 if ( $status != 2 );
     }
     elsif ($temperature >= 0) {
         $returnstring = $returnstring . "TEMPERATURE $temperature C - ";
-        $perfdata = $perfdata . "'temp'=$temperature;35;38;0;70 ";
+        $perfdata = $perfdata . "'temp'=$temperature;$warn_temperature;38;0;70 ";
     }
     else {
         $returnstring = $returnstring . "TEMPERATURE UNKNOWN! - ";
@@ -549,6 +556,7 @@ Usage: $script -H <hostname> -C <community> [...]
 
 Options: -H 	Hostname or IP address
          -C 	Community (default is public)
+         -T 	Warning Temperature
 	 
 -----------------------------------------------------------------	 
 Copyright 2004 Altinity Limited
@@ -561,5 +569,3 @@ it under the terms of the GNU General Public License
 USAGE
      exit 1;
 }
-
-
