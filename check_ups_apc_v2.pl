@@ -78,7 +78,7 @@ $output_status = 0;
 $output_current =0;
 $output_load = 0;
 $temperature = 0;
-$warn_temperature = 35;	# M. Fuchs
+$warn_temperature = 35;	# default warning temperature / M. Fuchs
 
 $input_freq = 0;		# added by Blueeye
 $output_freq = 0;		# added by Blueeye
