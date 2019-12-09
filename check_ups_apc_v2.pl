@@ -30,6 +30,13 @@
 #	Script edit by Andreas Winter (info@aw-edv-systeme.de)
 #	* adding Battery Replacement check
 #
+############
+#
+#	Script modified by M. Fuchs
+#	* added custom warning temperature
+#
+############
+
 
 use Net::SNMP;
 use Getopt::Std;
@@ -71,6 +78,7 @@ $output_status = 0;
 $output_current =0;
 $output_load = 0;
 $temperature = 0;
+$warn_temperature = 35;	# default warning temperature / M. Fuchs
 
 $input_freq = 0;		# added by Blueeye
 $output_freq = 0;		# added by Blueeye
@@ -86,7 +94,7 @@ if (@ARGV < 1) {
      usage();
 }
 
-getopts("h:H:C:w:c:");
+getopts("h:H:C:T:w:c");
 if ($opt_h){
     usage();
     exit(0);
@@ -104,6 +112,11 @@ if ($opt_C){
 else {
 }
 
+if ($opt_T){
+    $warn_temperature = $opt_T;
+}
+else {
+}
 
 
 # Create the SNMP session
@@ -430,17 +443,17 @@ sub main {
 
     if ($temperature > 38) {
         $returnstring = $returnstring . "!!!CRITICAL TEMPERATURE!!! $temperature C - ";
-        $perfdata = $perfdata . "'temp'=$temperature;35;38;0;70 ";
+        $perfdata = $perfdata . "'temp'=$temperature;$warn_temperature;38;0;70 ";
         $status = 2;
     }
-    elsif ($temperature > 35) {
+    elsif ($temperature > $warn_temperature) {
         $returnstring = $returnstring . "!!!WARNING TEMPERATURE!!! $temperature C - ";
-        $perfdata = $perfdata . "'temp'=$temperature;35;38;0;70 ";
+        $perfdata = $perfdata . "'temp'=$temperature;$warn_temperature;38;0;70 ";
         $status = 1 if ( $status != 2 );
     }
     elsif ($temperature >= 0) {
         $returnstring = $returnstring . "TEMPERATURE $temperature C - ";
-        $perfdata = $perfdata . "'temp'=$temperature;35;38;0;70 ";
+        $perfdata = $perfdata . "'temp'=$temperature;$warn_temperature;38;0;70 ";
     }
     else {
         $returnstring = $returnstring . "TEMPERATURE UNKNOWN! - ";
@@ -509,18 +522,20 @@ sub main {
         $status = 3 if ( ( $status != 2 ) && ( $status != 1 ) );
     }
 	
-######## Added by AW #############
-     if ($battery_replace == 2  ) {
-           $returnstring = $returnstring . "!!!BATTERY NEEDS REPLACING!!! - ";
-            $status = 2;
-          }
-      else {
-          $returnstring = $returnstring . "BATTERY OK!";
-          $status = 3 if ( ( $status == 1 ) );
-      }
+######## Added by AW / modified by M. Fuchs #############
+	if ($battery_replace == 2  ) {
+		$returnstring = $returnstring . "!!!BATTERY NEEDS REPLACING!!! - ";
+		$status = 2;
+	}
+	elsif ($battery_replace == 1  ) {
+		$returnstring = $returnstring . "BATTERY OK!";
+		$status = 0 if ( ( $status != 2 ) && ( $status != 1 ) );
+	}
+	else {
+		$status = 3;
+	}
 
-      $returnstring = $returnstring . " UPS Serialnumber: $ups_serial - ";
-
+	$returnstring = $returnstring . " UPS Serialnumber: $ups_serial - ";
 
 ####################
 	
@@ -541,6 +556,7 @@ Usage: $script -H <hostname> -C <community> [...]
 
 Options: -H 	Hostname or IP address
          -C 	Community (default is public)
+         -T 	Warning Temperature
 	 
 -----------------------------------------------------------------	 
 Copyright 2004 Altinity Limited
@@ -553,5 +569,3 @@ it under the terms of the GNU General Public License
 USAGE
      exit 1;
 }
-
-
