@@ -562,8 +562,8 @@ Usage: $script -H <hostname> -C <community> [...]
 
 Options: -H 	Hostname or IP address  (default: 192.1368.1.1)
          -C 	Community               (default: public)
-         -TW 	Warning Temperature     (default: 35°C)
-         -TC    Critical Temperature    (defalut: 38°C)
+         -I 	Warning Temperature     (default: 35°C)
+         -A     Critical Temperature    (defalut: 38°C)
 	 
 -----------------------------------------------------------------	 
 Copyright 2004 Altinity Limited
