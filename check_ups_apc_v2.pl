@@ -85,7 +85,7 @@ $input_freq = 0;		# added by Blueeye
 $output_freq = 0;		# added by Blueeye
 $input_volt = 0;		# added by Blueeye
 $output_volt = 0;		# added by Blueeye
-$battery_replace = 1;		# added by AW
+$battery_replace = 1;	# added by AW
 $ups_serial = "";		# added by AW
 
 
@@ -161,7 +161,7 @@ exit $status;
 
 sub main {
 
-        #######################################################
+    #######################################################
  
     if (!defined($s->get_request($oid_upstype))) {
         if (!defined($s->get_request($oid_sysDescr))) {
