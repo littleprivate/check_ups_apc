@@ -47,15 +47,15 @@ $script_version = "2.1";
 $metric = 1;
 
 $ipaddress = "192.168.1.1"; 	# default IP address, if none supplied
-$version = "1";			# SNMP version
-$timeout = 2;				# SNMP query timeout
+$version = "1";		        	# SNMP version
+$timeout = 2;			    	# SNMP query timeout
 # $warning = 100;			
 # $critical = 150;
 $status = 0;
 $returnstring = "";
 $perfdata = "";
 
-$community = "public"; 		# Default community string
+$community = "public"; 	    	# Default community string
 
 $oid_sysDescr = ".1.3.6.1.2.1.1.1.0";
 $oid_upstype = ".1.3.6.1.4.1.318.1.1.1.1.1.1.0";
@@ -70,7 +70,7 @@ $oid_output_freq = ".1.3.6.1.4.1.318.1.1.1.4.2.2.0";	# added by Blueeye
 $oid_input_volt = ".1.3.6.1.4.1.318.1.1.1.3.2.1.0";		# added by Blueeye
 $oid_output_volt = ".1.3.6.1.4.1.318.1.1.1.4.2.1.0";	# added by Blueeye
 $oid_battery_replace = "1.3.6.1.4.1.318.1.1.1.2.2.4.0";	# added by AW
-$oid_serial = "1.3.6.1.4.1.318.1.1.1.1.2.3.0"; # added by AW
+$oid_serial = "1.3.6.1.4.1.318.1.1.1.1.2.3.0";          # added by AW
 
 $upstype = "";
 $battery_capacity = 0;
