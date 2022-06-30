@@ -30,12 +30,19 @@
 #	Script edit by Andreas Winter (info@aw-edv-systeme.de)
 #	* adding Battery Replacement check
 #
+############
+#
+#	Script modified by M. Fuchs
+#	* added custom warning temperature
+#
+############
+
 
 use Net::SNMP;
 use Getopt::Std;
 
 $script    = "check_ups_apc_v2.pl";
-$script_version = "2.0";
+$script_version = "2.1";
 
 $metric = 1;
 
@@ -71,12 +78,14 @@ $output_status = 0;
 $output_current =0;
 $output_load = 0;
 $temperature = 0;
+$warn_temperature = 35;	# default warning temperature / M. Fuchs
+$crit_temperature = 38;	# default warning temperature / M. Fuchs
 
 $input_freq = 0;		# added by Blueeye
 $output_freq = 0;		# added by Blueeye
 $input_volt = 0;		# added by Blueeye
 $output_volt = 0;		# added by Blueeye
-$battery_replace = 1;		# added by AW
+$battery_replace = 1;	# added by AW
 $ups_serial = "";		# added by AW
 
 
@@ -86,7 +95,7 @@ if (@ARGV < 1) {
      usage();
 }
 
-getopts("h:H:C:w:c:");
+getopts("h:H:C:I:A:w:c");
 if ($opt_h){
     usage();
     exit(0);
@@ -104,7 +113,17 @@ if ($opt_C){
 else {
 }
 
+if ($opt_I){
+    $warn_temperature = $opt_I;
+}
+else {
+}
 
+if ($opt_A){
+    $crit_temperature = $opt_A;
+}
+else {
+}
 
 # Create the SNMP session
 my ($s, $e) = Net::SNMP->session(
@@ -142,7 +161,7 @@ exit $status;
 
 sub main {
 
-        #######################################################
+    #######################################################
  
     if (!defined($s->get_request($oid_upstype))) {
         if (!defined($s->get_request($oid_sysDescr))) {
@@ -428,19 +447,19 @@ sub main {
         $status = 3 if ( ( $status != 2 ) && ( $status != 1 ) );
     }
 
-    if ($temperature > 38) {
+    if ($temperature > $crit_temperature) {
         $returnstring = $returnstring . "!!!CRITICAL TEMPERATURE!!! $temperature C - ";
-        $perfdata = $perfdata . "'temp'=$temperature;35;38;0;70 ";
+        $perfdata = $perfdata . "'temp'=$temperature;$warn_temperature;$crit_temperature;0;70 ";
         $status = 2;
     }
-    elsif ($temperature > 35) {
+    elsif ($temperature > $warn_temperature) {
         $returnstring = $returnstring . "!!!WARNING TEMPERATURE!!! $temperature C - ";
-        $perfdata = $perfdata . "'temp'=$temperature;35;38;0;70 ";
+        $perfdata = $perfdata . "'temp'=$temperature;$warn_temperature;$crit_temperature;0;70 ";
         $status = 1 if ( $status != 2 );
     }
     elsif ($temperature >= 0) {
         $returnstring = $returnstring . "TEMPERATURE $temperature C - ";
-        $perfdata = $perfdata . "'temp'=$temperature;35;38;0;70 ";
+        $perfdata = $perfdata . "'temp'=$temperature;$warn_temperature;$crit_temperature;0;70 ";
     }
     else {
         $returnstring = $returnstring . "TEMPERATURE UNKNOWN! - ";
@@ -509,18 +528,20 @@ sub main {
         $status = 3 if ( ( $status != 2 ) && ( $status != 1 ) );
     }
 	
-######## Added by AW #############
-     if ($battery_replace == 2  ) {
-           $returnstring = $returnstring . "!!!BATTERY NEEDS REPLACING!!! - ";
-            $status = 2;
-          }
-      else {
-          $returnstring = $returnstring . "BATTERY OK!";
-          $status = 3 if ( ( $status == 1 ) );
-      }
+######## Added by AW / modified by M. Fuchs #############
+	if ($battery_replace == 2  ) {
+		$returnstring = $returnstring . "!!!BATTERY NEEDS REPLACING!!! - ";
+		$status = 2;
+	}
+	elsif ($battery_replace == 1  ) {
+		$returnstring = $returnstring . "BATTERY OK!";
+		$status = 0 if ( ( $status != 2 ) && ( $status != 1 ) );
+	}
+	else {
+		$status = 3;
+	}
 
-      $returnstring = $returnstring . " UPS Serialnumber: $ups_serial - ";
-
+	$returnstring = $returnstring . " UPS Serialnumber: $ups_serial - ";
 
 ####################
 	
@@ -539,13 +560,16 @@ Monitors APC SmartUPS via SNMP.
 
 Usage: $script -H <hostname> -C <community> [...]
 
-Options: -H 	Hostname or IP address
-         -C 	Community (default is public)
+Options: -H 	Hostname or IP address  (default: 192.1368.1.1)
+         -C 	Community               (default: public)
+         -TW 	Warning Temperature     (default: 35°C)
+         -TC    Critical Temperature    (defalut: 38°C)
 	 
 -----------------------------------------------------------------	 
 Copyright 2004 Altinity Limited
-Modified 03.2010 by Blueeye	 
-	 
+Modified 03.2010 by Blueeye
+Modified 06.2020 by M. Fuchs
+
 This program is free software; you can redistribute it or modify
 it under the terms of the GNU General Public License
 -----------------------------------------------------------------
@@ -553,5 +577,3 @@ it under the terms of the GNU General Public License
 USAGE
      exit 1;
 }
-
-
