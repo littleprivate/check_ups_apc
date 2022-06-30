@@ -42,7 +42,7 @@ use Net::SNMP;
 use Getopt::Std;
 
 $script    = "check_ups_apc_v2.pl";
-$script_version = "2.0";
+$script_version = "2.1";
 
 $metric = 1;
 
@@ -79,6 +79,7 @@ $output_current =0;
 $output_load = 0;
 $temperature = 0;
 $warn_temperature = 35;	# default warning temperature / M. Fuchs
+$crit_temperature = 38;	# default warning temperature / M. Fuchs
 
 $input_freq = 0;		# added by Blueeye
 $output_freq = 0;		# added by Blueeye
@@ -94,7 +95,7 @@ if (@ARGV < 1) {
      usage();
 }
 
-getopts("h:H:C:T:w:c");
+getopts("h:H:C:TW:TC:w:c");
 if ($opt_h){
     usage();
     exit(0);
@@ -112,12 +113,17 @@ if ($opt_C){
 else {
 }
 
-if ($opt_T){
-    $warn_temperature = $opt_T;
+if ($opt_TW){
+    $warn_temperature = $opt_TW;
 }
 else {
 }
 
+if ($opt_TC){
+    $crit_temperature = $opt_TC;
+}
+else {
+}
 
 # Create the SNMP session
 my ($s, $e) = Net::SNMP->session(
@@ -441,19 +447,19 @@ sub main {
         $status = 3 if ( ( $status != 2 ) && ( $status != 1 ) );
     }
 
-    if ($temperature > 38) {
+    if ($temperature > $crit_temperature) {
         $returnstring = $returnstring . "!!!CRITICAL TEMPERATURE!!! $temperature C - ";
-        $perfdata = $perfdata . "'temp'=$temperature;$warn_temperature;38;0;70 ";
+        $perfdata = $perfdata . "'temp'=$temperature;$warn_temperature;$crit_temperature;0;70 ";
         $status = 2;
     }
     elsif ($temperature > $warn_temperature) {
         $returnstring = $returnstring . "!!!WARNING TEMPERATURE!!! $temperature C - ";
-        $perfdata = $perfdata . "'temp'=$temperature;$warn_temperature;38;0;70 ";
+        $perfdata = $perfdata . "'temp'=$temperature;$warn_temperature;$crit_temperature;0;70 ";
         $status = 1 if ( $status != 2 );
     }
     elsif ($temperature >= 0) {
         $returnstring = $returnstring . "TEMPERATURE $temperature C - ";
-        $perfdata = $perfdata . "'temp'=$temperature;$warn_temperature;38;0;70 ";
+        $perfdata = $perfdata . "'temp'=$temperature;$warn_temperature;$crit_temperature;0;70 ";
     }
     else {
         $returnstring = $returnstring . "TEMPERATURE UNKNOWN! - ";
@@ -554,14 +560,16 @@ Monitors APC SmartUPS via SNMP.
 
 Usage: $script -H <hostname> -C <community> [...]
 
-Options: -H 	Hostname or IP address
-         -C 	Community (default is public)
-         -T 	Warning Temperature
+Options: -H 	Hostname or IP address  (default: 192.1368.1.1)
+         -C 	Community               (default: public)
+         -TW 	Warning Temperature     (default: 35°C)
+         -TC    Critical Temperature    (defalut: 38°C)
 	 
 -----------------------------------------------------------------	 
 Copyright 2004 Altinity Limited
-Modified 03.2010 by Blueeye	 
-	 
+Modified 03.2010 by Blueeye
+Modified 06.2020 by M. Fuchs
+
 This program is free software; you can redistribute it or modify
 it under the terms of the GNU General Public License
 -----------------------------------------------------------------
