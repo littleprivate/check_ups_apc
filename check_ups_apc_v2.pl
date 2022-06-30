@@ -95,7 +95,7 @@ if (@ARGV < 1) {
      usage();
 }
 
-getopts("h:H:C:w:c");
+getopts("h:H:C:I:A:w:c");
 if ($opt_h){
     usage();
     exit(0);
@@ -113,14 +113,14 @@ if ($opt_C){
 else {
 }
 
-if ($opt_w){
-    $warn_temperature = $opt_w;
+if ($opt_I){
+    $warn_temperature = $opt_I;
 }
 else {
 }
 
-if ($opt_c){
-    $crit_temperature = $opt_c;
+if ($opt_A){
+    $crit_temperature = $opt_A;
 }
 else {
 }
