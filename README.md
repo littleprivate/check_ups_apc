@@ -1,7 +1,7 @@
 # check_ups_apc
 Monitors APC SmartUPS via SNMP.
 
-Based on check_ups_apc.pl from altinity.com (Opsview) with modifications of Blueeye.
+Based on check_ups_apc.pl from altinity.com (Opsview) with modifications by Blueeye and M. Fuchs.
 
     Summary:
     perfdata for Battery Capacity
@@ -9,6 +9,7 @@ Based on check_ups_apc.pl from altinity.com (Opsview) with modifications of Blue
     Voltage-Monitoring (Input/Output and perfdata)
     Battery Replacement notification
     UPS Serialnumber
+	Temperature 
 
 Usage:
 
